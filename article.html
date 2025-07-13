@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create Article</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+        }
+
+        #articleForm {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            width: 350px;
+            margin: 60px auto;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        #articleForm input,
+        #articleForm textarea {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+
+        #articleForm button {
+            background: #007acc;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 0;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #articleForm button:hover {
+            background: #005fa3;
+        }
+
+        #resultBox {
+            margin-top: 12px;
+            color: #007acc;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="articleForm">
+        <h2>Create New Article</h2>
+        <input type="text" id="title" placeholder="Title" required>
+        <textarea id="body" placeholder="Body" rows="6" required></textarea>
+        <button type="submit">Create</button>
+        <div id="resultBox"></div>
+    </form>
+    <script>
+        document.getElementById('articleForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const body = document.getElementById('body').value;
+            const resultBox = document.getElementById('resultBox');
+            resultBox.style.display = "none";
+            try {
+                const response = await fetch('http://127.0.0.1/api/article', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, body })
+                });
+                const msg = await response.json();
+                resultBox.innerHTML = msg;
+                resultBox.style.display = "block";
+                if (response.ok) {
+                    setTimeout(() => { window.location.href = "blog.html"; }, 1000);
+                }
+            } catch (err) {
+                resultBox.innerHTML = "Error creating article.";
+                resultBox.style.display = "block";
+            }
+        });
+    </script>
+</body>
+</html>

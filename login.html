@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login page</title>
+    <style>
+        #mainBox {
+            padding: 40;
+            background-color: #00bfff;
+            width: 20%;
+        }
+        div > div{
+            padding:10px 10px;
+        }
+        #resultBox{
+            background-color: #003446;
+            width: 20%;
+            height: 50px;
+            color: white;
+            display: none;
+        }
+    </style>
+</head>
+<head></head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login page</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #00bfff 0%, #003446 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        #mainBox {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+            width: 350px;
+            padding: 32px 28px 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        #mainBox label {
+            font-weight: 700;
+            color: #003446;
+            margin-bottom: 6px;
+            display: block;
+        }
+        #mainBox input[type="text"], #mainBox input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #b0c4de;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            background: #f8fafd;
+            transition: border-color 0.2s;
+        }
+        #mainBox input[type="text"]:focus, #mainBox input[type="password"]:focus {
+            border-color: #00bfff;
+            outline: none;
+        }
+        #mainBox input[type="button"] {
+            width: 100%;
+            padding: 12px 0;
+            background: #00bfff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+        #mainBox input[type="button"]:hover {
+            background: #009acd;
+        }
+        #resultBox {
+            background-color: #003446;
+            width: 350px;
+            min-height: 40px;
+            color: white;
+            display: none;
+            margin: 18px auto 0 auto;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 10px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+     <div id="mainBox">
+        <div>
+            <label for="user">Username</label>
+            <input id="user" type="text">
+        </div>
+        <div>
+            <label for="pass">Password</label>
+            <input type="password" id="pass" type="text">
+        </div>
+        <div>
+            <input type="button" id="l" value="login">
+        </div>
+    </div>
+    <div id="resultBox"></div>
+
+    <script>
+        async function login(){
+            let userInput = document.getElementById("user").value;
+            let passInput = document.getElementById("pass").value;
+
+            const url = "http://127.0.0.1:80/api/login";
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        user: userInput,
+                        pass: passInput,
+                    })
+                });
+                if (!response.ok) {
+                    console.log('ERROR');
+                    const errorText = await response.json();
+                    let resultBox = document.getElementById("resultBox");
+                    resultBox.innerHTML = "";
+                    let elem = document.createElement("span");
+                    elem.innerHTML = errorText;
+                    resultBox.appendChild(elem);
+                    resultBox.style.display = "flex";
+                    resultBox.style.justifyContent = "center";
+                    resultBox.style.alignItems = "center";
+                }
+                else {
+                    const json = await response.json();
+                    let resultBox = document.getElementById("resultBox");
+                    resultBox.innerHTML = ""; 
+                    let elem = document.createElement("span");
+                    elem.innerHTML = json;
+                    resultBox.appendChild(elem);
+                    resultBox.style.display = "flex"; 
+                    resultBox.style.justifyContent = "center";
+                    resultBox.style.alignItems = "center";
+
+                    // If login is successful, show loading and redirect
+                    if (json === "Login done") {
+                        // Show loading animation/message
+                        // resultBox.innerHTML = '<span>Loading...</span>';
+                        resultBox.innerHTML = '<span><svg width="24" height="24" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="#00bfff" stroke-width="5" stroke-linecap="round" stroke-dasharray="31.4 31.4" transform="rotate(-90 25 25)"><animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/></circle></svg> Loading...</span>';
+                        resultBox.style.display = "flex";
+                        resultBox.style.justifyContent = "center";
+                        resultBox.style.alignItems = "center";
+                        // Redirect after 1 second
+                        setTimeout(function() {
+                            window.location.href = "blog.html";
+                        }, 2000);
+                    }
+                }                
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        document.getElementById("l")
+            .addEventListener("click", function(){
+                login();
+            });   
+    </script>
+</body>
+
+</html>

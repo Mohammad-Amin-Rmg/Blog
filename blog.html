@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>blog</title>
+    <style>
+        .article-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            width: 320px;
+            padding: 24px 20px 18px 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+        .article-card:hover {
+            box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+        }
+        .article-title {
+            font-size: 1.35em;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: #007acc;
+        }
+        .article-body {
+            font-size: 1.05em;
+            color: #333;
+            margin-bottom: 18px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: #e53935;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .delete-btn:hover {
+            background: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    <header style="background-color:#007acc; color:white; padding:20px 0; text-align:center; margin-bottom:30px;">
+        <h1 style="margin:0; font-size:2.5em;">My Blog</h1>
+        <p style="margin:5px 0 0 0; font-size:1.2em;">Latest Articles</p>
+        <a href="article.html" style="display:inline-block; margin-top:10px; color:#fff; background:#005fa3; padding:8px 18px; border-radius:6px; text-decoration:none; font-size:1em;">Create New Article</a>
+    </header>
+        
+    <main style="display:flex; justify-content:center;">
+        <div id="mainBox" style="display:flex; flex-wrap:wrap; gap:24px; justify-content:center; width:80%;"></div>
+    </main>
+
+    <script>
+        // Override createItemDiv and createItemButton for better UI
+        function createItemDiv(article){
+            let itemDiv = document.createElement("div");
+            itemDiv.className = "article-card";
+
+            let itemButton = createItemButton(itemDiv);
+
+            let itemH3 = document.createElement("h3");
+            itemH3.className = "article-title";
+            itemH3.textContent = article.title;
+
+            let itemP = document.createElement("p");
+            itemP.className = "article-body";
+            itemP.textContent = article.body;
+
+            itemButton.addEventListener("click", async function () {
+                let isArticleDeleted = await deleteArticle(article.id);
+                if(isArticleDeleted){
+                    itemDiv.parentNode.removeChild(itemDiv);
+                }
+            });
+
+            itemDiv.appendChild(itemButton);
+            itemDiv.appendChild(itemH3);
+            itemDiv.appendChild(itemP);
+
+            return itemDiv;
+        }
+
+        function createItemButton(div){
+            let itemButton = document.createElement("button");
+            itemButton.className = "delete-btn";
+            itemButton.title = "Delete article";
+            itemButton.innerHTML = "&times;";
+            return itemButton;
+        }
+        
+        async function deleteArticle(id){
+            const url = `http://127.0.0.1/api/article/${id}`;
+            try {
+                const response = await fetch(url, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) {
+                    console.log('ERROR.');
+                    let elem = document.createElement("span");
+                    elem.innerHTML = await response.json();
+                    document.getElementById("mainBox").appendChild(elem);
+                    return false;
+                }
+                else{
+                    console.log('Article deleted:', id);          
+                    return true;
+                }                
+            } catch (error) {
+                console.error(error);
+                return false;
+            }
+        }
+
+        async function getData() {
+            const url = "http://127.0.0.1/api/article";
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    console.log('ERROR.');
+                    let elem = document.createElement("span");
+                    elem.innerHTML = "";
+                    elem.innerHTML = await response.json();
+                    document.getElementById("mainBox").appendChild(elem);
+                }
+                else{
+                    const json = await response.json();
+                    for(let article of json.records){
+                        document.getElementById("mainBox").appendChild(createItemDiv(article));
+                    }
+                }                
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+
+        getData();
+    </script>
+</body>
+</html>
