@@ -13,7 +13,7 @@ A simple Node.js blog project with user authentication and article management.
 
 1. Clone the repo:
    ```
-   git clone https://github.com/Mohammad-Amin-Rmg/Blog_Node_Js.git
+   git clone https://github.com/Mohammad-Amin-Rmg/Blog.git
    ```
 2. Install dependencies:
    ```
