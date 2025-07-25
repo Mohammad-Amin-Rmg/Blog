@@ -1,12 +1,13 @@
 import { writeFile, readFile, readFileSync } from "fs";
 import { use, start, write } from "./httpFramework.js";
+import path from "path";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = "mySecretToken";
 const TOKEN_TIME = 30; //seconde
 
 function isValidUser(userPayload) {
-  let data = readFileSync("./users.json");
+  let data = readFileSync("./Data/users.json");
     let dataObject = JSON.parse(data);
     let found = false;
  for(let item of dataObject.records){
@@ -62,8 +63,9 @@ function generateId() {
 use("GET", "page", function (request, response) {
   let url = request.url.split("/");
   let inputs = url.slice(2);
+  const filePath = path.join(process.cwd(), "views", inputs[0]);
 
-  readFile(inputs[0], function (error, fileBody) {
+  readFile(filePath, function (error, fileBody) {
     if (error) {
       console.log("ERROR:", error);
       write(response, 404, "File not found :" + error);
@@ -73,7 +75,7 @@ use("GET", "page", function (request, response) {
   });
 });
 use("POST", "api/signup", function (request, response) {
-  readFile("./users.json", "utf8", function (error, fileData) {
+  readFile("./Data/users.json", "utf8", function (error, fileData) {
     if (error) {
       console.log("ERROR:", error);
       write(response, 500, "ERROR:" + error);
@@ -89,7 +91,7 @@ use("POST", "api/signup", function (request, response) {
       dataObject.records.push(request.data);
       let dataString = JSON.stringify(dataObject);
 
-      writeFile("./users.json", dataString, function (error) {
+      writeFile("./Data/users.json", dataString, function (error) {
         if (error) {
           console.log("ERROR:", error);
           write(response, 500, "ERROR:" + error);
@@ -102,7 +104,7 @@ use("POST", "api/signup", function (request, response) {
   });
 });
 use("POST", "api/login", function (request, response) {
-  readFile("./users.json", "utf8", function (error, fileData) {
+  readFile("./Data/users.json", "utf8", function (error, fileData) {
     if (error) {
       console.log("ERROR:", error);
       write(response, 500, "ERROR:" + error);
@@ -130,7 +132,7 @@ use("POST", "api/login", function (request, response) {
   });
 });
 use("POST", "api/article", function (request, response) {
-  readFile("./data.json", "utf8", function (error, fileData) {
+  readFile("./Data/data.json", "utf8", function (error, fileData) {
     if (error) {
       console.log("ERROR:", error);
       write(response, 500, "ERROR:" + error);
@@ -144,7 +146,7 @@ use("POST", "api/article", function (request, response) {
       dataObject.records.push(articleData);
       let dataString = JSON.stringify(dataObject);
 
-      writeFile("./data.json", dataString, function (error) {
+      writeFile("./Data/data.json", dataString, function (error) {
         if (error) {
           console.log("ERROR:", error);
           write(response, 500, "ERROR:" + error);
@@ -165,7 +167,7 @@ use("DELETE", "api/article", function (request, response) {
   if (!verifyToken(parseCookie(request.headers.cookie, "token"))) {
     write(response, 401, JSON.stringify("Not logged in"));
   } else {
-    readFile("./data.json", "utf8", function (error, fileData) {
+    readFile("./Data/data.json", "utf8", function (error, fileData) {
       if (error) {
         console.log("ERROR:", error);
         write(response, 500, "ERROR:" + error);
@@ -181,7 +183,7 @@ use("DELETE", "api/article", function (request, response) {
 
         if (found) {
           let dataString = JSON.stringify(dataObject);
-          writeFile("./data.json", dataString, function (error) {
+          writeFile("./Data/data.json", dataString, function (error) {
             if (error) {
               console.log("ERROR:", error);
               write(response, 500, "ERROR:" + error);
@@ -201,7 +203,7 @@ use("GET", "api/article", function (request, response) {
   if (!verifyToken(parseCookie(request.headers.cookie, "token"))) {
     write(response, 401, JSON.stringify("Not logged in"));
   } else {
-    readFile("./data.json", "utf8", function (error, fileData) {
+    readFile("./Data/data.json", "utf8", function (error, fileData) {
       if (error) {
         console.log("ERROR:", error);
         write(response, 500, "ERROR:" + error);

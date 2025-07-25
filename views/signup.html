@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup page</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+
+    <style>
+        #mainBox {
+            padding: 40;
+            background-color: #00bfff;
+            width: 20%;
+        }
+        div > div{
+            padding:2px 10px;
+        }
+        #resultBox{
+            background-color: #003446;
+            width: 20%;
+            height: 50px;
+            color: white;
+            display: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, #00bfff 0%, #003446 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        #mainBox {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            width: 350px;
+            padding: 32px 28px 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        #mainBox label {
+            font-weight: 700;
+            color: #003446;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        #mainBox input[type="text"],
+        #mainBox input[type="password"],
+        #mainBox input[type="email"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #b0c4de;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            background: #f8fafd;
+            transition: border-color 0.2s;
+        }
+
+        #mainBox input[type="text"]:focus,
+        #mainBox input[type="password"]:focus,
+        #mainBox input[type="email"]:focus {
+            border-color: #00bfff;
+            outline: none;
+        }
+
+        #mainBox input[type="button"] {
+            width: 100%;
+            padding: 12px 0;
+            background: #00bfff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+
+        #mainBox input[type="button"]:hover {
+            background: #009acd;
+        }
+
+        #resultBox {
+            background-color: #003446;
+            width: 350px;
+            min-height: 40px;
+            color: white;
+            display: none;
+            margin: 18px auto 0 auto;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+
+        .switch-link a {
+            color: #00bfff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .switch-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div id="mainBox">
+            <div>
+                <label for="user">Username</label>
+                <input id="user" type="text">
+            </div>
+            <div>
+                <label for="pass">Password</label>
+                <input id="pass" type="password">
+            </div>
+            <div>
+                <label for="mail">Email</label>
+                <input id="mail" type="email">
+            </div>
+            <div>
+                <input type="button" id="s" value="Sign Up">
+            </div>
+            <div class="switch-link">
+                Already have an account? <a href="login.html">Login</a>
+            </div>
+        </div>
+        <div id="resultBox"></div>
+    </div>
+
+    <script>
+        async function signup() {
+            let userInput = document.getElementById("user").value.trim();
+            let passInput = document.getElementById("pass").value.trim();
+            let mailInput = document.getElementById("mail").value.trim();
+
+            let resultBox = document.getElementById("resultBox");
+            resultBox.style.display = "none";
+            resultBox.innerHTML = "";
+
+            if (!userInput || !passInput || !mailInput) {
+                resultBox.textContent = "Please fill in all fields.";
+                resultBox.style.display = "flex";
+                return;
+            }
+
+            const url = "http://127.0.0.1:80/api/signup";
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        user: userInput,
+                        pass: passInput,
+                        mail: mailInput,
+                    })
+                });
+
+                const json = await response.json();
+                resultBox.innerHTML = "";
+                let elem = document.createElement("span");
+                elem.innerHTML = json;
+                resultBox.appendChild(elem);
+                resultBox.style.display = "flex";
+                resultBox.style.justifyContent = "center";
+                resultBox.style.alignItems = "center";
+
+                if (json === "Signup done") {
+                    resultBox.innerHTML = '<span style="color: #90ee90;">Signup successful! Redirecting...</span>';
+                    setTimeout(() => window.location.href = "login.html", 2000);
+                }
+            } catch (error) {
+                console.error(error);
+                resultBox.textContent = "Error occurred. Please try again.";
+                resultBox.style.display = "flex";
+            }
+        }
+
+        document.getElementById("s")
+            .addEventListener("click", function () {
+                signup();
+            });
+    </script>
+</body>
+
+</html>
